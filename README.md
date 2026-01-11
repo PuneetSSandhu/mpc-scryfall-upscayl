@@ -9,7 +9,7 @@ Simple tool to retrieve Scryfall scans of MTG cards, upscale the image using `up
 - Basic knowledge on how to run Python.
 - An internet connection (it uses Scryfall).
 - An installation of [Upscayl](https://upscayl.org/download) and the locaton of the binary `upscayl-bin`.
-- A location where you have the model you want to use to upscayle.
+- Location of the model you want to use to upscale the cards. [Models](https://github.com/xinntao/Real-ESRGAN)
 
 ## Usage Guide
 
