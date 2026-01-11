@@ -2,4 +2,7 @@ black
 imageio
 numpy
 Scrython
-replicate
+sys
+glob
+upscayl-bin
+subprocess
