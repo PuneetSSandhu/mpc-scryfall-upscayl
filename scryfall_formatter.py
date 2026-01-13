@@ -10,14 +10,14 @@ import glob
 import sys
 
 # Path to the Upscayl binary
-UPSCAYL = "/Applications/Upscayl.app/Contents/Resources/bin/upscayl-bin"
+UPSCAYL = "path/to/upscayl-bin"
 
 UPSCAYL_ENABLE = 1
 
 STAMP_REMOVAL_ENABLE = 1
 
 # Path to the folder where Upscayl keeps its models
-MODELS = "/Users/sandh312/Downloads/realesrgan-ncnn-vulkan-20220424-macos/models"
+MODELS = "path/to/models"
 
 UB_SETS = []
 
