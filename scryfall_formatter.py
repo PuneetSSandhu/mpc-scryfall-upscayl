@@ -19,8 +19,6 @@ STAMP_REMOVAL_ENABLE = 1
 # Path to the folder where Upscayl keeps its models
 MODELS = "path/to/models"
 
-UB_SETS = []
-
 # Directory used for caching upscaled images to avoid re-upscaling when we just want to re-format
 CACHE_DIR = "imgcache"
 # Directory used for storing formatted images
@@ -278,7 +276,7 @@ def process_card(card, frame, type, image_uris, face_number=None):
             cx = int(w_img * 0.50)  # centered horizontally
             cy = int(h_img * 0.90)  # near bottom
 
-            rx = int(w_img * 0.04)  # horizontal radius
+            rx = int(w_img * 0.045)  # horizontal radius
             ry = int(h_img * 0.018)  # vertical radius
 
             # --- Build ellipse mask ---
