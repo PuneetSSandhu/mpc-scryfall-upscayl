@@ -10,14 +10,14 @@ import glob
 import sys
 
 # Path to the Upscayl binary
-UPSCAYL = "path/to/upscayl-bin"
+UPSCAYL = "/Applications/Upscayl.app/Contents/Resources/bin/upscayl-bin"
 
 UPSCAYL_ENABLE = 1
 
 STAMP_REMOVAL_ENABLE = 1
 
 # Path to the folder where Upscayl keeps its models
-MODELS = "path/to/models"
+MODELS = "/Users/sandh312/Downloads/realesrgan-ncnn-vulkan-20220424-macos/models"
 
 # Directory used for caching upscaled images to avoid re-upscaling when we just want to re-format
 CACHE_DIR = "imgcache"
@@ -37,8 +37,6 @@ UPSCALE_FACTOR = 1
 
 # No need to touch
 DEBUG = False
-
-FULLARTS = []
 
 
 class CardFrame(enum.Enum):
@@ -83,10 +81,6 @@ class RedactBoxType(enum.Enum):
 
 
 def search_and_process_card(query):
-    FID = -1
-    if query in FULLARTS:
-        FID = FULLARTS.index(query)
-
     query = query.strip()
 
     # If advanced search syntax is used
@@ -104,10 +98,7 @@ def search_and_process_card(query):
         card = scrython.cards.Named(exact=query)
 
     card = card.to_dict()
-    if FID != -1:
-        FULLARTS[FID] = (
-            f"{card['name'].replace('//', '&')}#{card['set'].upper()}#{(card['collector_number'])}"
-        )
+
     if "card_faces" in card:
 
         for face_number, face_card in enumerate(card["card_faces"]):
@@ -228,8 +219,8 @@ def process_card(card, frame, type, image_uris, face_number=None):
         pad = 40 * UPSCALE_FACTOR  # Pad image by 1/8th of inch on each edge
         bordertol = 32  # Overfill onto existing border by 32px to remove white corners
 
-        if cardname in FULLARTS:
-            print("Found in fullart list")
+        if card["full_art"]:
+            print("Full art card identified")
             bordertol = 0
             pad = 0
 
@@ -264,11 +255,13 @@ def process_card(card, frame, type, image_uris, face_number=None):
             ] = bordercolour
             im_padded = draw_corner_triangle(im_padded, size=0, color=bordercolour)
 
+        # full art cards will need a 30 pixel offset for the stamp to be covered
         if (
             card["frame"] == "2015"
             and (card["rarity"] == "rare" or card["rarity"] == "mythic")
             and card["security_stamp"] == "oval"
             and STAMP_REMOVAL_ENABLE
+            and not card["full_art"]
         ):
             h_img, w_img, _ = im_padded.shape
 
@@ -290,6 +283,7 @@ def process_card(card, frame, type, image_uris, face_number=None):
             and (card["rarity"] == "rare" or card["rarity"] == "mythic")
             and card["security_stamp"] == "triangle"
             and STAMP_REMOVAL_ENABLE
+            and not card["full_art"]
         ):
             h_img, w_img, _ = im_padded.shape
             width = int(w_img * 0.10)
@@ -361,10 +355,6 @@ if __name__ == "__main__":
         os.makedirs(CACHE_DIR)
     if not os.path.exists(UPSCAYLD):
         os.makedirs(UPSCAYLD)
-
-    with open("fullarts.txt", "r") as fa:
-        for card in fa:
-            FULLARTS.append(card)
 
     # Loop through each card in cards.txt and scan em all
     with open("cards.txt", "r") as fp:

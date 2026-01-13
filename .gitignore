@@ -1,0 +1,5 @@
+.vscode
+__pycache__/
+imgcache/
+formatted/
+*_upscayld
