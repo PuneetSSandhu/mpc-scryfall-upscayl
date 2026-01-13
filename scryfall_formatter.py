@@ -10,12 +10,16 @@ import glob
 import sys
 
 # Path to the Upscayl binary
-UPSCAYL = "*/upscayl-bin"
+UPSCAYL = "/Applications/Upscayl.app/Contents/Resources/bin/upscayl-bin"
 
 UPSCAYL_ENABLE = 1
 
+STAMP_REMOVAL_ENABLE = 1
+
 # Path to the folder where Upscayl keeps its models
-MODELS = "*/models"
+MODELS = "/Users/sandh312/Downloads/realesrgan-ncnn-vulkan-20220424-macos/models"
+
+UB_SETS = []
 
 # Directory used for caching upscaled images to avoid re-upscaling when we just want to re-format
 CACHE_DIR = "imgcache"
@@ -261,6 +265,62 @@ def process_card(card, frame, type, image_uris, face_number=None):
                 :,
             ] = bordercolour
             im_padded = draw_corner_triangle(im_padded, size=0, color=bordercolour)
+
+        if (
+            card["frame"] == "2015"
+            and (card["rarity"] == "rare" or card["rarity"] == "mythic")
+            and card["security_stamp"] == "oval"
+            and STAMP_REMOVAL_ENABLE
+        ):
+            h_img, w_img, _ = im_padded.shape
+
+            # --- Holostamp position (relative, not hard-coded) ---
+            cx = int(w_img * 0.50)  # centered horizontally
+            cy = int(h_img * 0.90)  # near bottom
+
+            rx = int(w_img * 0.04)  # horizontal radius
+            ry = int(h_img * 0.018)  # vertical radius
+
+            # --- Build ellipse mask ---
+            y, x = np.ogrid[:h_img, :w_img]
+            mask = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1
+
+            # --- Apply border colour ---
+            im_padded[mask] = bordercolour
+        elif (
+            card["frame"] == "2015"
+            and (card["rarity"] == "rare" or card["rarity"] == "mythic")
+            and card["security_stamp"] == "triangle"
+            and STAMP_REMOVAL_ENABLE
+        ):
+            h_img, w_img, _ = im_padded.shape
+            width = int(w_img * 0.10)
+            height = int(h_img * 0.04)
+            # --- Triangle position (relative) ---
+            cx = int(w_img * 0.50)  # centered horizontally
+            cy = int(h_img * 0.903)  # near bottom
+
+            rx = int(w_img * 0.04)  # horizontal radius
+            ry = int(h_img * 0.015)  # vertical radius
+
+            # Triangle vertices (pointing up)
+            p1 = (cx, cy + height // 2)  # tip of triangle pointing down
+            p2 = (cx - width // 2, cy - height // 2)  # top left
+            p3 = (cx + width // 2, cy - height // 2)  # top right
+
+            # --- Build mask using barycentric technique ---
+            y, x = np.mgrid[:h_img, :w_img]
+
+            def sign(px, py, ax, ay, bx, by):
+                return (px - bx) * (ay - by) - (ax - bx) * (py - by)
+
+            b1 = sign(x, y, *p1, *p2) < 0.0
+            b2 = sign(x, y, *p2, *p3) < 0.0
+            b3 = sign(x, y, *p3, *p1) < 0.0
+
+            mask = (b1 == b2) & (b2 == b3)
+
+            im_padded[mask] = bordercolour
 
         # Write image to disk
         imageio.imwrite(formatted_path, im_padded.astype(np.uint8))
