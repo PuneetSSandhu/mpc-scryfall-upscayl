@@ -29,6 +29,8 @@ UPSCAYLD = "upscayld"
 # See PNG output size at https://scryfall.com/docs/api/images
 SCRYFALL_BASE_SIZE = (745, 1040)
 
+STAMP_COLOR = [98, 99, 98]
+
 border_factor = 3 / 4  # adjust this if the borders are overlapping with any frames
 
 # We upscale SCRYFALL_BASE_SIZE by x2 which results in a 600dpi image at 2.5" x 3.5" (596dpi to be exact)
@@ -286,14 +288,11 @@ def process_card(card, frame, type, image_uris, face_number=None):
             and not card["full_art"]
         ):
             h_img, w_img, _ = im_padded.shape
-            width = int(w_img * 0.10)
-            height = int(h_img * 0.04)
+            width = int(w_img * 0.1)
+            height = int(h_img * 0.045)
             # --- Triangle position (relative) ---
             cx = int(w_img * 0.50)  # centered horizontally
-            cy = int(h_img * 0.903)  # near bottom
-
-            rx = int(w_img * 0.04)  # horizontal radius
-            ry = int(h_img * 0.015)  # vertical radius
+            cy = int(h_img * 0.905)  # near bottom
 
             # Triangle vertices (pointing up)
             p1 = (cx, cy + height // 2)  # tip of triangle pointing down
