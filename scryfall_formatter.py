@@ -14,7 +14,7 @@ UPSCAYL = "/Applications/Upscayl.app/Contents/Resources/bin/upscayl-bin"
 
 UPSCAYL_ENABLE = 1
 
-STAMP_REMOVAL_ENABLE = 1
+STAMP_REMOVAL_ENABLE = 0
 
 # Path to the folder where Upscayl keeps its models
 MODELS = "/Users/sandh312/Downloads/realesrgan-ncnn-vulkan-20220424-macos/models"
@@ -357,5 +357,9 @@ if __name__ == "__main__":
 
     # Loop through each card in cards.txt and scan em all
     with open("cards.txt", "r") as fp:
-        for cardname in fp:
+        cardSet = {}
+        for cardname in fp:  # remove duplicates
+            cardSet.add(cardname)
+
+        for cardname in cardSet:
             search_and_process_card(cardname)
