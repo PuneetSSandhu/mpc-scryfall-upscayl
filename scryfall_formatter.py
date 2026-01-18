@@ -348,6 +348,8 @@ def process_card(card, frame, type, image_uris, face_number=None):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         UPSCAYLD = f"{sys.argv[1]}_upscayld"
+    else:
+        UPSCAYL = "Upscayld_Images"
     if not os.path.exists(FORMATTED_DIR):
         os.makedirs(FORMATTED_DIR)
     if not os.path.exists(CACHE_DIR):
@@ -357,7 +359,7 @@ if __name__ == "__main__":
 
     # Loop through each card in cards.txt and scan em all
     with open("cards.txt", "r") as fp:
-        cardSet = {}
+        cardSet = set()
         for cardname in fp:  # remove duplicates
             cardSet.add(cardname)
 
